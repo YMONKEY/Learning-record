@@ -1,0 +1,92 @@
+### 本地环境 XAMPP+phpStorm+XDebug+chrome配置和断点调试
+
+* 开始服务器端配置：安装好XAMPP，停止apache服务（注意，如果直接退出XAMPP，是不会停止apache的）。
+
+* 在安装目录下找到php.ini，类似于D:\xampp\php\php.ini，并打开。
+
+* 找到被注释掉的项目（去掉前面的？）并按如下设置：
+
+[XDebug]
+
+zend_extension = "D:\xampp\php\ext\php_xdebug.dll"
+
+xdebug.profiler_append = 0
+
+xdebug.profiler_enable = 1
+
+xdebug.profiler_enable_trigger = 0
+
+xdebug.profiler_output_dir = "D:\xampp\tmp"
+
+xdebug.profiler_output_name = "cachegrind.out.%t-%s"
+
+xdebug.remote_enable = on
+
+xdebug.remote_handler = "dbgp"
+
+xdebug.remote_host = "127.0.0.1"
+
+xdebug.trace_output_dir = "D:\xampp\tmp"
+
+xdebug.idekey= PHPSTROM
+
+其中remote_host 是指调试客户端的地址，即IDE所在的IP，同理remote_port 是客户端的端口，这两项在远程调试的情况下注意修改，远程的时候最终改为:
+
+ 
+[XDebug]
+
+zend_extension = "D:\xampp\php\ext\php_xdebug.dll"
+
+xdebug.profiler_append = 0
+
+xdebug.profiler_enable = 1
+
+xdebug.profiler_enable_trigger = 0
+
+xdebug.profiler_output_dir = "D:\xampp\tmp"
+
+xdebug.profiler_output_name = "cachegrind.out.%t-%s"
+
+xdebug.remote_enable = 1
+
+xdebug.remote_handler = "dbgp"
+
+xdebug.remote_mode = "req"
+
+xdebug.remote_port = 9000
+
+ 
+
+* 保存文件，重新启动apache检查是否成功开启了xdebug服务。
+
+本地环境配置和断点调试 一种方法为在CMD里输入D:\xampp\php\php.exe -m 看到XDebug，说明成功开启XDebug。
+
+本地环境配置和断点调试
+
+另一种方法为浏览器打开localhost，找到phpinfo（）点击打开配置情况，查找xdebug项，找到了说明xdebug配置成功。
+
+本地环境配置和断点调试
+
+至此，服务器端配置完毕。
+
+ 
+* 下面是客户端调试。打开phpStorm，进入File>Settings>PHP，这里要interpreter浏览，填D:\xampp\php\php.exe，自动识别版本。
+
+本地环境配置和断点调试
+
+* 进入File>Settings>PHP>Servers，这里要填写服务器端的相关信息，name填localhost，host填localhost，port填80，debugger选XDebug。
+
+* 进入File>Settings>PHP>Debug，看到XDebug选项卡，port填9000，其他默认
+
+* 进入File>Settings>PHP>Debug>DBGp Proxy，IDE key 填 PHPSTORM，host 填localhost，port 填9000，点OK退出设置。
+
+本地环境 <wbr>XAMPP+phpStorm+XDebug+chrome <wbr>配置和断点调试
+
+* 进入Run> Debug configurations，点+号，Server选填localhost，start url填http://localhost/9999m， Browse 填chrome，点OK退出设置。
+点OK退出设置之后，phpstorm运行按钮旁边自动填充localhost，且运行按钮由灰色被激活成为绿色。如果start url填的是http://localhost，没有填写9999m，则当点击phpstorm运行按钮，浏览器进入默认地址http://localhost，没办法直接访问http://localhost/9999m。
+
+
+
+* 在phpStorm里打开监听，就是一个电话一样的按钮，点击变为绿色，在程序代码点前点击，设置程序段点，点击绿色的debug爬虫按钮，chrome浏览器打开xdebug页，phpStorm出现debug窗口，并获取到variables值，即为看到下面的debug信息，说明成功配置。图
+
+* 就是第7步“7.进入File>Settings>PHP>Debug>DBGp Proxy，IDE key 填 PHPSTORM，host 填localhost，port 填80。”需要改动下port填为9000。
