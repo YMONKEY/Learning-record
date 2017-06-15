@@ -1,0 +1,15 @@
+devtools的安装(通过composer安装)
+
+1  在本机的某个目录下比如说d:\github\phalcon
+
+增加一个composer.json文件 
+
+内容如下
+
+{
+　　"require": {
+　　　　"phalcon/devtools": "dev-master"
+　　}
+}
+
+2 运行cmd,进入到该目录 比如说 cd d:\github\phalcon,运行composer install,会生成vendor目录,在vendor/phalcon/devtools目录是很重要的目录,他的结构如下
