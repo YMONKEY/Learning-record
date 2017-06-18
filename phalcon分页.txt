@@ -1,0 +1,37 @@
+ Phalcon的分页查询方式
+发布于 2小时前 作者 marser 27 次浏览 来自 分享
+
+phalcon的分页查询，在文档中有两种方式。
+第一种，使用模型中的find方法配合PaginatorModel：
+
+$currentPage = (int) $_GET["page"];
+$robots      = Robots::find();
+$paginator   = new PaginatorModel(
+    array(
+        "data"  => $robots,
+        "limit" => 10,
+        "page"  => $currentPage
+    )
+);
+$paginator = $paginator->getPaginate();
+
+如果对phalcon底层SQL有做日志记录的话，会看到这种方式是先把所有数据取出来，再进行切割分页的，显然不符合现实需要。
+
+第二种，通过PHQL的Query Builder来处理：
+
+$builder = $this -> getModelsManager() -> createBuilder();
+        $builder -> from(__CLASS__);
+        $builder -> where('name = :name:', array('name' => 'aa'));
+        $builder -> andWhere('age = = :age:', array('age' => '10'));
+        $limit = 20;  //限制条数
+        $page = 1;   //页码
+   
+        //分页处理
+        $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder(array(
+            'builder' => $builder,
+            'limit' => $limit,
+            'page' => $page,
+        ));
+        $paginator = $paginator -> getPaginate();
+
+再贴个$paginator对象的操作方式文档：
