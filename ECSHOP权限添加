@@ -1,0 +1,46 @@
+1、文件
+ecshop/admin/includes/inc_menu.php (ECSHOP 管理中心菜单数组)
+ecshop/admin/includes/inc_priv.php (ECSHOP 权限对照表) 
+ecshop/languages/zh_cn/admin/common.php (ecshop语言包)
+
+2、数据表(ecs_admin_action)
+
+3、左侧菜单栏显示（index.php?act=menu）
+
+添加一个左侧菜单
+	1、首先在inc_menu.php中添加菜单数组
+	如
+		//城市与套餐
+		$modules['18_city_package']['01_selection_list'] = 'city_package?act=list';
+		$modules['18_city_package']['02_selection_add'] = 'city_package?act=add';
+		
+	2、在inc_priv.php添加权限对照
+	如
+		//城市与套餐
+		$purview['01_selection_list'] = 'cp_list';
+		$purview['02_selection_add'] = 'cp_add';
+	3、在common.php添加语言
+	如
+	
+		//城市与套餐
+		$_LANG['18_city_package'] = '城市与套餐';
+		$_LANG['01_selection_list']       = '城市与套餐关联列表';
+		$_LANG['02_selection_add']        = '添加城市套餐';
+		
+	4、在ECSHOP 权限名称语言文件 （priv_action.php）
+	如
+		//城市与套餐
+		$_LANG['city_package'] = '城市与套餐';
+		$_LANG['cp_list'] = '城市与套餐关联列表';
+		$_LANG['cp_add'] = '添加城市套餐';
+		
+		
+		
+//ecshop权限研究记录
+ecs_role(角色数据表) 字段 role_id role_name action_list role_describe
+		action_list：存储action_code
+ecs_admin_action()	所有的权限从表中读取 
+
+check_authz_json('remove_back');//检查权限
+		
+		
