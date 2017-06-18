@@ -1,0 +1,83 @@
+高并发下的抢购、秒杀功能 
+
+常规写法：查询出对应商品的库存，看是否大于0，然后执行生成订单等操作，但是在判断库存是否大于0处，如果在高并发下就会有问题，导致库存量出现负数
+
+<?php
+class ControllerSpikeTest extends Controller {
+	public function index() {
+
+		$result = $this->db->query("SELECT  * FROM " . DB_PREFIX . "yl_product WHERE id = 1");
+		print_r($result);
+		$row = $result->row;
+		if($row['stock']<1){
+			exit('商品已抢完');
+		}
+		//更新商品库存
+		$result_update = $this->db->query("update " . DB_PREFIX . "yl_product set stock = stock-1 WHERE id = 1");
+		//秒杀成功记录
+		$result_insert = $this->db->query("INSERT INTO " . DB_PREFIX . "yl_record values('','testname','1',NOW())");
+		
+	}
+}
+
+ab模拟高并发测试：
+ab -n 1000 -c 800  /index.php?route=spike/test
+商品库存30，但发现商品库存字段值为-1，记录41条秒杀成功记录。在高并发下导致秒杀成功数超出
+
+常用优化方法：
+
+1、使用MySQL的事务，锁住操作的行
+
+<?php
+class ControllerSpikeTest extends Controller {
+	public function index() {
+	
+		$this->db->query("BEGIN");  
+
+		$result = $this->db->query("SELECT  * FROM " . DB_PREFIX . "yl_product WHERE id = 1");
+		$row = $result->row;
+		if($row['stock']<1){
+			exit('商品已抢完');
+		}else{
+			//更新商品库存
+			$result_update = $this->db->query("update " . DB_PREFIX . "yl_product set stock = stock-1 WHERE id = 1 AND stock>1");
+			
+			if(!$result_update){
+				$this->db->query("ROLLBACK");  
+				exit('商品已抢完');
+			}
+			
+			//秒杀成功记录
+			$result_insert = $this->db->query("INSERT INTO " . DB_PREFIX . "yl_record values('','testname','1',NOW())");
+			
+			$this->db->query("COMMIT");  
+			
+		}
+		
+		
+	}
+}
+
+2、使用使用redis队列，因为redis是单线程 pop操作是原子的，即使有很多用户同时到达，也是依次执行
+
+<?php
+class ControllerSpikeTest extends Controller {
+	public function index() {
+	
+		$redis = $this->redis;
+		
+		$count=$redis->lpop('product_count'); 
+		
+		if(!$count){
+			exit('商品已抢完');
+		}
+		
+		//更新商品库存
+		$result_update = $this->db->query("update " . DB_PREFIX . "yl_product set stock = stock-1 WHERE id = 1");
+		//秒杀成功记录
+		$result_insert = $this->db->query("INSERT INTO " . DB_PREFIX . "yl_record values('','testname','1',NOW())");
+				
+	}
+}
+
+
