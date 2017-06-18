@@ -1,0 +1,44 @@
+Nginx 负载均衡设置
+
+常见算法：轮询、权重、IP哈希
+
+1、轮询算法
+
+upstream test_svr{
+	server 192.168.0.1:80;
+	server 192.168.0.2:80;
+	server 192.168.0.3:80;
+}
+
+server{
+	listen 192.168.0.8;
+	server_name www.test.com;
+	access_log /data/logs/access.log;
+	error_log /data/logs/error.log;
+	
+	location /{
+		proxy_pass http://test_svr;
+		root /data/test
+		
+		index index.php index.html
+	}
+}
+
+2、权重算法
+
+upstream test_svr{
+	server 192.168.0.1:80 weight=2 max_fails=1 fail_timeout=10s;
+	server 192.168.0.2:80 weight=2 max_fails=1 fail_timeout=10s;
+	server 192.168.0.3:80 weight=6 max_fails=1 fail_timeout=10s;
+}
+
+weight 设置权重 max_fails和fail_timeout表示如果某台服务器在fail_timeout时间内出现max_files次连接失败，那么nginx就会认为该服务器出现故障，剔除该服务器
+
+3、ip 哈希算法
+
+upstream test_svr{
+	ip_hash;
+	server 192.168.0.1:80;
+	server 192.168.0.2:80;
+	server 192.168.0.3:80;
+}
