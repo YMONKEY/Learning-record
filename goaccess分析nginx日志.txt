@@ -1,0 +1,57 @@
+通过yum安装goaccess
+
+1、yum install goaccess
+2、修改配置文件 /etc/goaccess.conf
+time-format %H:%M:%S
+date-format %d/%b/%Y
+log-format %h %^[%d:%t %^] "%r" %s %b "%R" "%u"
+
+3、goaccess -f access.log -a > /var/www/html/test.log
+
+各项代表的意思可以去http://goaccess.io/man#custom-log 查看。
+
+###功能一览
+
+    生成统计数据，带宽统计等
+    每个请求的时间统计
+    最高访问ip
+    请求的文件统计
+    请求的静态文件、图片、flash、js文件等
+    各HTTP状态码统计
+    Hosts，反向DNS，IP所在地
+    操作系统
+    浏览器/蜘蛛
+    引用的网站
+    引用的URLs
+    关键词组
+    地理位置 （大陆、国家、城市）
+    可输出JSON或CSV
+    各种的颜色主题
+    支持大容量数据且支持大容量数据的持续分析
+    支持IPv6
+    可生成HTML报告
+
+	
+使用GoAccess生成html报告：
+
+1 goaccess -f access.log -a > report.html
+
+生成json报告：
+
+1 oaccess -f access.log -a -d -o json > report.json
+
+CSV:
+
+1 goaccess -f access.log -o csv > report.csv
+
+由于nginx会自动压缩日志，一下命令可以直接分析压缩后的日志：
+
+
+zcat access.log.*.gz | goaccess
+#或者
+zcat -f access.log* | goaccess	
+
+支持各种管道：sed -n '/11\/Dec\/2014/,$ p' access.log | goaccess -a
+
+分析百度/google对你网站爬了些啥内容
+grep -E "(google|baidu)" access.log | goaccess -a
