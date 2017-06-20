@@ -1,0 +1,75 @@
+opencart后台新增一个页面
+
+例子：招商加盟页面
+	
+
+1、在后端添加一个控制器 /admin/controller/webcms/hot_invest.php
+
+<?php
+class ControllerWebcmsHotInvest extends Controller {
+	
+	private $error = array();
+	
+	public function index(){};
+	
+	public function add(){};
+	
+	public function edit(){};
+	
+	public function delete(){};
+	
+	public function getList(){};
+	
+	public function getForm(){};
+	
+	public function validateForm(){};
+	
+	public function validateDelete(){}
+	
+	publjc function autocomplete(){}
+
+}
+
+2、在后端添加模型 /admin/model/webcms/hot_invest.php
+
+<?php
+class ModelWebcmsHotInvest extends Model {
+	
+}
+
+3、在后端添加视图文件 /admin/view/template/webcms/hot_inverst_list.tpl
+
+4、在后端添加语言文件 /admin/language/zh-cn/webcms/hot_invest.php
+
+<?php
+
+// Heading
+$_['heading_title']     	= '火热招商';
+
+
+5、在左侧导航栏添加菜单 /admin/controller/common/column_left.php
+
+			$webcms = array();
+
+			if ($this->user->hasPermission('access', 'webcms/hot_invest')) {
+				$webcms[] = array(
+					'name'	   => $this->language->get('text_hot_invest'),
+					'href'     => $this->url->link('webcms/hot_invest', 'token=' . $this->session->data['token'], true),
+					'children' => array()
+				);
+			}
+			if($webcms){
+				$data['menus'][] = array(
+					'id'       => 'menu-webcms',
+					'icon'	   => 'fa-newspaper-o',
+					'name'	   => $this->language->get('text_webcms'),
+					'href'     => '',
+					'children' => $webcms
+				);			
+
+6、修改后端左侧菜单栏语言文件	/admin/language/zh-cn/common/column_left.php
+			$_['text_webcms']		 			   	 = '内容管理';
+			$_['text_hot_invest']                   = '火热招商';
+			
+7、后台添加权限
+			系统设置=》管理员群组=》超级管理员群组	
