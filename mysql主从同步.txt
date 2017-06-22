@@ -1,0 +1,32 @@
+MTSQL主从同步
+
+
+1、在主服务器上为从服务器建立一个用户：grant replication slave on *.* to '用户名'@'主机' identified by '密码';
+   在主服务器添加防火墙规则 -A INPUT -s 127.0.0.1/32 -m tcp -p tcp --dport 3306 -j ACCEPT
+	
+
+2、编辑主服务器的配置文件：/etc/my.cnf  
+log-bin=mysql-bin
+binlog-do-db = opencart
+server-id	= 1
+
+3、编辑从服务器的配置文件：/etc/my.cnf
+server-id=10
+replicate-do-db = opencatrt
+server-id = 10
+
+change master to
+master_host='host',
+master_user='root',
+master_password='',
+master_log_file='mysql-bin.000017',
+master_log_pos=120;
+
+4、启动从服务器上的复制线程：start slave; 验证主从设置是否已经成功：show slave status
+
+Slave_IO_Running: Yes
+Slave_SQL_Running: Yes
+
+5、测试主从同步是否成功
+
+
