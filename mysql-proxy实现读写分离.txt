@@ -1,0 +1,57 @@
+mysql-proxy实现读写分离
+
+环境： 
+操作系统:centos7.2
+主服务器Master：192.168.0.168
+从服务器Slave ：192.168.0.169
+
+调度服务器:mysql-proxy:192.168.0.169(因为只有两台服务器，调度服务器安装在从服务器上)
+
+1、 yum安装mysql-proxy  yum install mysql-proxy 
+
+2、创建mysql-proxy.cnf配置文件
+mkdir /usr/local/mysql-proxy
+cd /usr/local/mysql-proxy
+mkdir lua
+mkdir logs
+vi mysql-proxy.cnf
+[mysql-proxy]
+admin-username=root
+admin-password=pass
+proxy-address=192.168.0.169:4040
+proxy-read-only-backend-addresses=192.168.0.169
+proxy-backend-addresses=192.168.0.168
+proxy-lua-script=/usr/local/mysql-proxy/lua/rw-splitting.lua #(没有可以在官网下载对应的包：https://downloads.mysql.com/archives/proxy/)
+admin-lua-script=/usr/lib64/mysql-proxy/lua/admin.lua
+log-file=/usr/local/mysql-proxy/logs/mysql-proxy.log
+log-level=info
+daemon=true
+keepalive=true
+
+chmod 660 /usr/local/mysql-proxy/mysql-porxy.cnf
+
+3、修改读写分离配置文件
+
+vim /usr/local/mysql-proxy/lua/rw-splitting.lua
+if not proxy.global.config.rwsplit then
+ proxy.global.config.rwsplit = {
+  min_idle_connections = 1, #默认超过4个连接数时，才开始读写分离，改为1
+  max_idle_connections = 2, #默认8，改为2
+  is_debug = false
+ }
+end
+
+4、启动mysql-proxy
+mysql-proxy --defaults-file=/usr/local/mysql-proxy/mysql-porxy.cnf
+
+5、测试读写分离
+在主从服务器上创建proxy用户用于mysql-proxy是用
+GRANT ALL PRIVILEGES ON *.* to root@192.168.0.169 identified by 'pass';
+
+在mysql配置文件中修改：
+define('DB_HOSTNAME', '192.168.0.169');
+define('DB_PORT', '4040');
+
+测试结果:update insert delet 操作都在主服务器上 select 操作在从服务器上
+
+
