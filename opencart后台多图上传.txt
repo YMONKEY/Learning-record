@@ -1,0 +1,97 @@
+1、点击按钮促发daaImage方法
+<td class="text-left">
+	<button type="button" onclick="addImage();" data-toggle="tooltip" title="<?php echo $button_image_add; ?>" class="btn btn-primary">
+		<i class="fa fa-plus-circle"></i>
+	</button>
+</td>
+2、JS动态添加一行，通过image_row标识每行
+<script type="text/javascript"><!--
+var image_row = <?php echo $image_row; ?>;
+
+function addImage() {
+	html  = '<tr id="image-row' + image_row + '">';
+	html += '  <td class="text-left"><a href="" id="thumb-image' + image_row + '"data-toggle="image" class="img-thumbnail"><img src="<?php echo $placeholder; ?>" alt="" title="" data-placeholder="<?php echo $placeholder; ?>" /></a><input type="hidden" name="product_image[' + image_row + '][image]" value="" id="input-image' + image_row + '" /></td>';
+	html += '  <td class="text-right"><input type="text" name="product_image[' + image_row + '][sort_order]" value="" placeholder="<?php echo $entry_sort_order; ?>" class="form-control" /></td>';
+	html += '  <td class="text-left"><button type="button" onclick="$(\'#image-row' + image_row  + '\').remove();" data-toggle="tooltip" title="<?php echo $button_remove; ?>" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>';
+	html += '</tr>';
+
+	$('#images tbody').append(html);
+
+	image_row++;
+}
+//--></script>
+3、在公用JS中给data-toggle = 'image'的A标签绑定点击事件。点击促发function方法。
+
+// Image Manager
+	$(document).on('click', 'a[data-toggle=\'image\']', function(e) {
+		var $element = $(this);
+		var $popover = $element.data('bs.popover'); // element has bs popover?
+		
+		e.preventDefault();
+
+		// destroy all image popovers
+		$('a[data-toggle="image"]').popover('destroy');
+
+		// remove flickering (do not re-add popover when clicking for removal)
+		if ($popover) {
+			return;
+		}
+
+		$element.popover({
+			html: true,
+			placement: 'right',
+			trigger: 'manual',
+			content: function() {
+				return '<button type="button" id="button-image" class="btn btn-primary"><i class="fa fa-pencil"></i></button> <button type="button" id="button-clear" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>';
+			}
+		});
+
+		$element.popover('show');
+
+		$('#button-image').on('click', function() {
+			var $button = $(this);
+			var $icon   = $button.find('> i');
+			
+			$('#modal-image').remove();
+			
+			if (Cookies.get('imagemanager_last_open_folder') && (Cookies.get('imagemanager_last_open_folder')!='undefined')) {
+				imagemanager_last_open_folder = Cookies.get('imagemanager_last_open_folder');
+			} else {
+				imagemanager_last_open_folder = '';
+			}
+			
+			$.ajax({
+				url: 'index.php?route=common/filemanager&token=' + getURLVar('token') + '&directory=' + imagemanager_last_open_folder + '&target=' + $element.parent().find('input').attr('id') + '&thumb=' + $element.attr('id'),
+				dataType: 'html',
+				beforeSend: function() {
+					$button.prop('disabled', true);
+					if ($icon.length) {
+						$icon.attr('class', 'fa fa-circle-o-notch fa-spin');
+					}
+				},
+				complete: function() {
+					$button.prop('disabled', false);
+					if ($icon.length) {
+						$icon.attr('class', 'fa fa-pencil');
+					}
+				},
+				success: function(html) {
+					$('body').append('<div id="modal-image" class="modal">' + html + '</div>');
+
+					$('#modal-image').modal('show');
+				}
+			});
+
+			$element.popover('destroy');
+		});
+
+		$('#button-clear').on('click', function() {
+			$element.find('img').attr('src', $element.find('img').attr('data-placeholder'));
+
+			$element.parent().find('input').val('');
+
+			$element.popover('destroy');
+		});
+	});
+通过ajax返回一个图片管理弹出框，传递参数有target，thumb，分别是type为hidden的元素，显示图片的A标签元素。把选择图片的路径赋给这两个元素。传递参数不是写死的，所以使用灵活性高。可以在同一个页面重用
+                    
