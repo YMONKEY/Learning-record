@@ -1,0 +1,66 @@
+public function download(){
+
+        $result = array(
+            'status' => false,
+            'data'   => '',
+            'msg'    => ''
+        );
+
+        $this->load->library('PHPExcel');
+        $objPHPExcel = new PHPExcel();
+
+        $gets = $this->input->get(NULL, TRUE);
+        $gets['start_date'] = '2017-11-07 14:04:22';
+        $conditions = array();
+        if(isset($gets['start_date']) && $gets['start_date']){
+            $conditions['add_time >='] = $gets['start_date'];
+        }
+
+        if(isset($gets['end_date']) && $gets['end_date']){
+            $conditions['add_time<='] = $gets['end_date'];
+        }
+
+        if(isset($gets['status']) && $gets['status']){
+            $conditions['status'] = $gets['status'];
+        }
+
+        if(isset($gets['pay_type']) && $gets['pay_type']){
+            $conditions['pay_type'] = $gets['pay_type'];
+        }
+        $params['conditions'] = $conditions;
+        $orderInfo = $this->Order_model->getOrderInfo($params);
+
+        if(!$orderInfo){
+            $result['msg'] = '下载数据为空';
+            return $this->returnJson($result);
+        }
+
+        $name = 'order' . '_' . date("YmdHis");    //生成的Excel文件文件名
+
+        $array_title = array('订单号','下单时间','付款时间','支付类型','订单金额','订单状态');
+
+
+        $array_data = array();
+        foreach($orderInfo as $k=>$v){
+            $array_data[] = array(
+                $v['order_num'],
+                $v['add_time'],
+                $v['success_time'],
+                $v['pay_type'],
+                $v['money'],
+                $v['pay_status']
+            );
+        }
+
+        $objPHPExcel->getActiveSheet(0)->fromArray( $array_title, null, 'A1', true );
+        $objPHPExcel->getActiveSheet(0)->fromArray( $array_data, null, 'A2', true );
+
+        $objPHPExcel->getActiveSheet()->setTitle('order');
+        $objPHPExcel->setActiveSheetIndex(0);
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$name.'.xls"');
+        header('Cache-Control: max-age=0');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter->save('php://output');
+        exit;
+    }
