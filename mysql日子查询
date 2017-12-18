@@ -1,0 +1,43 @@
+binLOG日志
+数据库 /home/mysqldata目录下
+bin日志转换文本
+mysqlbinlog -v --base64-output=decode-rows --database=cyj_private mysql-bin.0003 > binlog.txt   
+grep -A 100 -B 100  "关键词"   文件名
+
+
+nginx主配置添加post记录
+log_format  main  '$remote_addr - $remote_user [$time_local] requesthost:"$http_host"; "$request" requesttime:"$request_time"; '
+                      '$status $body_bytes_sent "$http_referer" - $request_body'
+                      '"$http_user_agent" "$http_x_forwarded_for"';    
+
+
+主查询代理服务器 /var/log/nginx/access.log   对应时间
+find /var/log/nginx/ -name "*.log*" -type f | xargs grep "关键词"     web服务器查询
+
+
+onproxy操作mysql记录
+cat /usr/local/oneproxy/log/oneproxy.log |grep pay_num                144 145服务器
+查看操作的记录 /usr/local/oneproxy/log/oneproxy.log
+find /home/oneproxylog -name "*.log*" -type f | xargs grep "pay_num"
+
+
+日志脚本
+#!/bin/bash
+cat /usr/local/oneproxy/log/oneproxy.log > /home/oneproxylog/`date +%F-%H:%M:%S`.log
+> /usr/local/oneproxy/log/oneproxy.log
+find /home/oneproxylog/* -mtime +2|xargs rm -rf
+
+
+mysql -uadmin -pOneProxy -h127.0.0.1 -P4041 -e "SET SQL_DEBUG on"   执行开启(每天重启oneproxy需要再执行一次)
+
+* */8 * * * sh /usr/local/oneproxy/log/cutlog.sh   
+
+
+
+
+
+
+
+
+
+
