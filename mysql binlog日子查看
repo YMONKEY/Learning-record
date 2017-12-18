@@ -1,0 +1,226 @@
+1、show binary logs; //查看是否开启binlog日志
+
+2、开启binlog日志
+
+[mysqld]
+skip-name-resolve
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+log-bin=mysqlbin-log ##开启binlog日志
+# Disabling symbolic-links is recommended to prevent assorted security risks
+symbolic-links=0
+# Settings user and group are ignored when systemd is used.
+# If you need to run mysqld under a different user or group,
+# customize your systemd unit file for mysqld according to the
+# instructions in http://fedoraproject.org/wiki/Systemd
+[client]
+default-character-set=utf8
+[mysqld]
+character_set_server=utf8
+max_connections = 6000
+[mysqld_safe]
+log-error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+
+3、binlog日志路径 ：/var/lib/mysql
+
+4、查看binlog文件的内容
+show binlog events;
+
+5、查看当前正在写入的binlog文件
+mysql> show master status\G
+
+6、获取binlog文件列表
+mysql> show binary logs;
+
+7、查看binlog日子
+mysqlbinlog  --no-defaults  --start-position=181 --stop-position=303  mysqlbin-log.000001 
+
+/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1*/;
+/*!40019 SET @@session.max_insert_delayed_threads=0*/;
+/*!50003 SET @OLD_COMPLETION_TYPE=@@COMPLETION_TYPE,COMPLETION_TYPE=0*/;
+DELIMITER /*!*/;
+# at 4
+#171213 22:58:33 server id 1  end_log_pos 107 	Start: binlog v 4, server v 5.5.57-log created 171213 22:58:33 at startup
+# Warning: this binlog is either in use or was not closed properly.
+ROLLBACK/*!*/;
+BINLOG '
+2egxWg8BAAAAZwAAAGsAAAABAAQANS41LjU3LWxvZwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAADZ6DFaEzgNAAgAEgAEBAQEEgAAVAAEGggAAAAICAgCAA==
+'/*!*/;
+# at 181
+#171213 22:58:54 server id 1  end_log_pos 303 	Query	thread_id=153	exec_time=0	error_code=0
+use `cyj_public`/*!*/;
+SET TIMESTAMP=1513220334/*!*/;
+SET @@session.pseudo_thread_id=153/*!*/;
+SET @@session.foreign_key_checks=1, @@session.sql_auto_is_null=0, @@session.unique_checks=1, @@session.autocommit=1/*!*/;
+SET @@session.sql_mode=0/*!*/;
+SET @@session.auto_increment_increment=1, @@session.auto_increment_offset=1/*!*/;
+/*!\C utf8 *//*!*/;
+SET @@session.character_set_client=33,@@session.collation_connection=33,@@session.collation_server=33/*!*/;
+SET @@session.lc_time_names=0/*!*/;
+SET @@session.collation_database=DEFAULT/*!*/;
+update baseball_match set Match_JS=0 where Match_JS=2
+/*!*/;
+DELIMITER ;
+# End of log file
+ROLLBACK /* added by mysqlbinlog */;
+/*!50003 SET COMPLETION_TYPE=@OLD_COMPLETION_TYPE*/;
+/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0*/;
+
+
+基于开始/结束时间
+mysqlbinlog --no-defaults --start-datetime='2013-09-10 00:00:00' --stop-datetime='2013-09-10 01:01:01' -d 库名 二进制文件
+
+mysqlbinlog --no-defaults --start-datetime='2017-12-13 23:46:00' --stop-datetime='2017-12-14 00:00:00' mysqlbin-log.000001 
+
+
+/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1*/;
+/*!40019 SET @@session.max_insert_delayed_threads=0*/;
+/*!50003 SET @OLD_COMPLETION_TYPE=@@COMPLETION_TYPE,COMPLETION_TYPE=0*/;
+DELIMITER /*!*/;
+# at 4
+#171213 22:58:33 server id 1  end_log_pos 107 	Start: binlog v 4, server v 5.5.57-log created 171213 22:58:33 at startup
+# Warning: this binlog is either in use or was not closed properly.
+ROLLBACK/*!*/;
+BINLOG '
+2egxWg8BAAAAZwAAAGsAAAABAAQANS41LjU3LWxvZwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAADZ6DFaEzgNAAgAEgAEBAQEEgAAVAAEGggAAAAICAgCAA==
+'/*!*/;
+# at 674207
+#171213 23:48:00 server id 1  end_log_pos 674282 	Query	thread_id=13134	exec_time=0	error_code=0
+SET TIMESTAMP=1513223280/*!*/;
+SET @@session.pseudo_thread_id=13134/*!*/;
+SET @@session.foreign_key_checks=1, @@session.sql_auto_is_null=0, @@session.unique_checks=1, @@session.autocommit=1/*!*/;
+SET @@session.sql_mode=0/*!*/;
+SET @@session.auto_increment_increment=1, @@session.auto_increment_offset=1/*!*/;
+/*!\C utf8 *//*!*/;
+SET @@session.character_set_client=33,@@session.collation_connection=33,@@session.collation_server=33/*!*/;
+SET @@session.lc_time_names=0/*!*/;
+SET @@session.collation_database=DEFAULT/*!*/;
+BEGIN
+/*!*/;
+# at 674282
+#171213 23:48:00 server id 1  end_log_pos 674310 	Intvar
+SET INSERT_ID=202520/*!*/;
+# at 674310
+#171213 23:48:00 server id 1  end_log_pos 675712 	Query	thread_id=13134	exec_time=0	error_code=0
+use `cyj_private`/*!*/;
+SET TIMESTAMP=1513223280/*!*/;
+INSERT INTO `c_bet_report` (`uid`, `username`, `site_id`, `index_id`, `agent_id`, `num`, `bet_all`, `bet_yx`, `win`, `win_num`, `day_type`, `day_time`, `do_time`) VALUES ('1766','818gaming','aaa','a','154','2','22.000000','22.000000','0.000000','0','20171213','2017-12-13 00:00:00','2017-12-13 23:48:00'),('283315','m1111','aaa','a','154','109','1090.000000','1090.000000','58.500000','3','20171213','2017-12-13 00:00:00','2017-12-13 23:48:00'),('283319','lol5v5','aaa','a','154','2219','2399.000000','2399.000000','806.060000','131','20171213','2017-12-13 00:00:00','2017-12-13 23:48:00'),('283328','jltx111','aaa','a','154','145','1450.000000','1450.000000','2310.500000','5','20171213','2017-12-13 00:00:00','2017-12-13 23:48:00'),('283356','qaz112','aaa','a','154','10','110.000000','110.000000','213.400000','2','20171213','2017-12-13 00:00:00','2017-12-13 23:48:00'),('283360','m9999','aaa','a','154','4','40.000000','40.000000','0.000000','0','20171213','2017-12-13 00:00:00','2017-12-13 23:48:00'),('283311','818bbb','aaa','a','1773','2756','4200.000000','4200.000000','2159.250000','148','20171213','2017-12-13 00:00:00','2017-12-13 23:48:00') ON DUPLICATE KEY UPDATE  `agent_id`=VALUES(`agent_id`), `num`=VALUES(`num`), `bet_all`=VALUES(`bet_all`), `bet_yx`=VALUES(`bet_yx`),`win`=VALUES(`win`),`win_num`=VALUES(`win_num`)
+/*!*/;
+# at 675712
+#171213 23:48:00 server id 1  end_log_pos 675739 	Xid = 238009
+COMMIT/*!*/;
+# at 675739
+#171213 23:48:00 server id 1  end_log_pos 675814 	Query	thread_id=16537	exec_time=0	error_code=0
+SET TIMESTAMP=1513223280/*!*/;
+BEGIN
+/*!*/;
+# at 675814
+#171213 23:48:00 server id 1  end_log_pos 675842 	Intvar
+SET INSERT_ID=6603929/*!*/;
+# at 675842
+#171213 23:48:00 server id 1  end_log_pos 676361 	Query	thread_id=16537	exec_time=0	error_code=0
+SET TIMESTAMP=1513223280/*!*/;
+INSERT INTO `site_bet_report` ( `site_id`, `num`, `bet_all`, `bet_yx`, `win`, `win_num`, `jack`,`day_type`, `day_time`, `do_time`, `type`) VALUES ('aaa','5245','9311.000000','9311.000000','5547.710000','289','0.000000','20171213','2017-12-13 00:00:00','2017-12-13 23:48:00','fc') ON DUPLICATE KEY UPDATE `num`=VALUES(`num`), `bet_all`=VALUES(`bet_all`), `bet_yx`=VALUES(`bet_yx`),`win`=VALUES(`win`),`win_num`=VALUES(`win_num`),`jack`=VALUES(`jack`)
+/*!*/;
+# at 676361
+#171213 23:48:00 server id 1  end_log_pos 676388 	Xid = 238046
+COMMIT/*!*/;
+# at 676388
+#171213 23:48:00 server id 1  end_log_pos 676463 	Query	thread_id=16239	exec_time=0	error_code=0
+SET TIMESTAMP=1513223280/*!*/;
+BEGIN
+/*!*/;
+# at 676463
+#171213 23:48:00 server id 1  end_log_pos 676599 	Query	thread_id=16239	exec_time=0	error_code=0
+SET TIMESTAMP=1513223280/*!*/;
+DELETE FROM v_bet_report WHERE vtype='im' AND day_type ='20171213'
+/*!*/;
+# at 676599
+#171213 23:48:00 server id 1  end_log_pos 676675 	Query	thread_id=16239	exec_time=0	error_code=0
+SET TIMESTAMP=1513223280/*!*/;
+COMMIT
+/*!*/;
+# at 676675
+#171213 23:48:01 server id 1  end_log_pos 676749 	Query	thread_id=16538	exec_time=0	error_code=0
+SET TIMESTAMP=1513223281/*!*/;
+BEGIN
+/*!*/;
+# at 676749
+#171213 23:48:01 server id 1  end_log_pos 677024 	Query	thread_id=16538	exec_time=0	error_code=0
+use `cyj_public`/*!*/;
+SET TIMESTAMP=1513223281/*!*/;
+SET @@session.time_zone='SYSTEM'/*!*/;
+Update `lq_match` set Match_Ho='0.910',Match_Ao='0.910',Match_RGG='17',Match_DxGG='',Match_DxDpl='0',Match_DxXpl='',Match_DsDpl='1.91',Match_DsSpl='1.91',Match_LstTime=now() where Match_ID='2310968'
+/*!*/;
+# at 677024
+#171213 23:48:01 server id 1  end_log_pos 677051 	Xid = 238091
+COMMIT/*!*/;
+# at 677051
+#171213 23:48:02 server id 1  end_log_pos 677125 	Query	thread_id=16549	exec_time=0	error_code=0
+SET TIMESTAMP=1513223282/*!*/;
+BEGIN
+/*!*/;
+# at 677125
+#171213 23:48:02 server id 1  end_log_pos 677153 	Intvar
+SET INSERT_ID=361447/*!*/;
+# at 677153
+#171213 23:48:02 server id 1  end_log_pos 677388 	Query	thread_id=16549	exec_time=0	error_code=0
+SET TIMESTAMP=1513223282/*!*/;
+insert into yn_ffc_auto ( qishu,datetime,ok,shiwan_ok,ball_1,ball_2,ball_3,ball_4,ball_5) values ('201712140708','2017-12-14 11:48:00c','1', '1','6','9','9', '1','5')
+/*!*/;
+# at 677388
+#171213 23:48:02 server id 1  end_log_pos 677415 	Xid = 238197
+COMMIT/*!*/;
+# at 677415
+#171213 23:48:02 server id 1  end_log_pos 677489 	Query	thread_id=16550	exec_time=0	error_code=0
+SET TIMESTAMP=1513223282/*!*/;
+BEGIN
+/*!*/;
+# at 677489
+#171213 23:48:02 server id 1  end_log_pos 677517 	Intvar
+SET INSERT_ID=4754720/*!*/;
+# at 677517
+#171213 23:48:02 server id 1  end_log_pos 677720 	Query	thread_id=16550	exec_time=0	error_code=0
+SET TIMESTAMP=1513223282/*!*/;
+INSERT INTO `cyj_public`.`lottery_lock` (`qishu`, `fc_type`, `times`,`status`, `is_shiwan`) VALUES ( '201712140708', 'yn_ffc', 1,2, 0)
+/*!*/;
+# at 677720
+#171213 23:48:02 server id 1  end_log_pos 677747 	Xid = 238220
+COMMIT/*!*/;
+# at 677747
+#171213 23:48:02 server id 1  end_log_pos 677821 	Query	thread_id=16554	exec_time=0	error_code=0
+SET TIMESTAMP=1513223282/*!*/;
+BEGIN
+/*!*/;
+# at 677821
+#171213 23:48:02 server id 1  end_log_pos 677984 	Query	thread_id=16554	exec_time=0	error_code=0
+SET TIMESTAMP=1513223282/*!*/;
+update lottery_lock set status=1 where qishu=201712140708 and fc_type="yn_ffc" and is_shiwan=0
+/*!*/;
+# at 677984
+#171213 23:48:02 server id 1  end_log_pos 678011 	Xid = 238245
+COMMIT/*!*/;
+# at 678011
+#171213 23:48:05 server id 1  end_log_pos 678085 	Query	thread_id=16562	exec_time=0	error_code=0
+SET TIMESTAMP=1513223285/*!*/;
+BEGIN
+/*!*/;
+# at 678085
+#171213 23:48:05 server id 1  end_log_pos 678113 	Intvar
+SET INSERT_ID=1179006/*!*/;
+# at 678113
+#171213 23:48:05 server id 1  end_log_pos 678298 	Query	thread_id=16562	exec_time=0	error_code=0
+SET TIMESTAMP=1513223285/*!*/;
+insert into kjw_auto ( qishu,type,datetime,ball ) values ('201712140708','yn_ffc','2017-12-13 23:48:05','6,9,9,1,5')
+/*!*/;
+# at 678298
+#171213 23:48:05 server id 1  end_log_pos 678325 	Xid = 238466
+COMMIT/*!*/;
+DELIMITER ;
+# End of log file
+ROLLBACK /* added by mysqlbinlog */;
+/*!50003 SET COMPLETION_TYPE=@OLD_COMPLETION_TYPE*/;
+/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0*/;
