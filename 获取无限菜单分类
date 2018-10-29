@@ -1,0 +1,38 @@
+    //获取无限分类菜单
+    public function getMenuList(){
+        $sql = "select * from br_admin_menu order by pid ASC ";
+        $qry = $this->db->query($sql);
+
+        $res = [];
+        foreach ($qry as $row){
+
+            if(!$row['pid']){
+                $res[$row['menu_id']] = $row;
+                continue;
+            }
+
+            //存在则加入MAP
+            $this->getTree($res,$row);
+
+        }
+
+        return $res;
+
+    }
+
+    public function getTree(&$res,$row){
+
+        foreach($res as $k => &$v)
+        {
+            if($v['menu_id'] == $row['pid'])
+            {        
+                $v['next'][] = $row;
+                break;
+            }else{
+                if(isset($v['next']))
+                    $this->getTree($v['next'],$row);
+            }
+        }
+        return $res;
+
+    }
